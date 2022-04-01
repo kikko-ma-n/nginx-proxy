@@ -1,0 +1,52 @@
+version: '2'
+
+services:
+
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - conf:/etc/nginx/conf.d      #acme-companion
+      - certs:/etc/nginx/certs:ro   #acme-companion
+      - vhost:/etc/nginx/vhost.d    #acme-companion
+      - html:/usr/share/nginx/html  #acme-companion
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    # environment:
+      # デフォルトのドメイン
+      # DEFAULT_HOST: {ドメイン名}
+    restart: always
+
+  acme-companion:
+    image: nginxproxy/acme-companion
+    container_name: nginx-proxy-acme
+    volumes_from:
+      - nginx-proxy
+    volumes:
+      - certs:/etc/nginx/certs:rw
+      - acme:/etc/acme.sh
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: always
+
+volumes:
+  conf:
+  certs:
+  vhost:
+  html:
+  acme:
+
+# リバースプロキシを適応したいdocker-compose.ymlに下記を記述
+#
+# (省略)
+# services:
+#   {サービス名}
+#     environment:
+#       - VIRTUAL_HOST={ドメイン名}
+#     networks:
+#       - nginx-proxy_default
+# (省略)
+# networks:
+#   nginx-proxy_default:
+#     external: true
