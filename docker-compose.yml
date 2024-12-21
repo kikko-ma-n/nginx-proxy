@@ -43,7 +43,8 @@ volumes:
 # services:
 #   {サービス名}
 #     environment:
-#       - VIRTUAL_HOST={ドメイン名}
+#       - VIRTUAL_HOST={ドメイン名},www.{ドメイン名}
+#       - LETSENCRYPT_HOST={ドメイン名},www.{ドメイン名}
 #     networks:
 #       - nginx-proxy_default
 # (省略)
